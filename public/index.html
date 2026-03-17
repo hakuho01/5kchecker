@@ -1,0 +1,38 @@
+<html>
+<body>
+
+<h2>MTG Deck Price</h2>
+
+<textarea id="list" rows="12" cols="40">
+4 Brainstorm
+2 Ponder
+</textarea>
+
+<br><br>
+
+<button onclick="calc()">計算</button>
+
+<pre id="result"></pre>
+
+<script>
+
+async function calc(){
+
+  const text=document.getElementById("list").value
+
+  const res=await fetch("/calc",{
+    method:"POST",
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({list:text})
+  })
+
+  const data=await res.json()
+
+  document.getElementById("result").textContent=
+    JSON.stringify(data,null,2)
+}
+
+</script>
+
+</body>
+</html>
