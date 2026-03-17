@@ -1,0 +1,205 @@
+:root {
+  color-scheme: light dark;
+  --bg: #0f172a;
+  --panel: #1e293b;
+  --accent: #38bdf8;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+  --danger: #f97373;
+  --border: #334155;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background: radial-gradient(circle at top, #1e293b 0, #020617 60%);
+  color: var(--text);
+}
+
+.container {
+  max-width: 900px;
+  margin: 32px auto;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.92);
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.9);
+}
+
+h1 {
+  margin-top: 0;
+  font-size: 1.8rem;
+  text-align: center;
+}
+
+h2 {
+  margin-top: 1.5rem;
+  font-size: 1.2rem;
+}
+
+.card-input-section {
+  margin-top: 1rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #020617;
+  color: var(--text);
+  resize: vertical;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+}
+
+textarea::placeholder {
+  color: var(--muted);
+}
+
+button {
+  margin-top: 0.75rem;
+  padding: 0.7rem 1.4rem;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #38bdf8, #22c55e);
+  color: #0f172a;
+  font-weight: 600;
+  font-size: 0.95rem;
+  box-shadow: 0 12px 30px rgba(56, 189, 248, 0.45);
+  transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.1s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 40px rgba(56, 189, 248, 0.6);
+  opacity: 0.95;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+  box-shadow: none;
+}
+
+.button-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 0.75rem;
+}
+
+#cache-clear-button {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+
+#cache-clear-button:hover {
+  color: var(--text);
+  border-color: var(--accent);
+  box-shadow: none;
+}
+
+.result-section {
+  margin-top: 1.5rem;
+}
+
+#status {
+  min-height: 1.4rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+#status.error {
+  color: var(--danger);
+}
+
+.result-summary {
+  margin-bottom: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.result-summary .badge {
+  display: inline-block;
+  margin-left: 0.25rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.badge-over {
+  background: var(--danger);
+  color: #fff;
+}
+
+.badge-ok {
+  background: #22c55e;
+  color: #0f172a;
+}
+
+#result-table th.total-over {
+  color: var(--danger);
+}
+
+#result-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+#result-table th,
+#result-table td {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+}
+
+#result-table thead {
+  background: rgba(15, 23, 42, 0.9);
+}
+
+#result-table tbody tr:nth-child(odd) {
+  background: rgba(15, 23, 42, 0.65);
+}
+
+#result-table tbody tr:nth-child(even) {
+  background: rgba(15, 23, 42, 0.85);
+}
+
+#result-table tbody tr.row-error td {
+  color: var(--danger);
+}
+
+#result-table tfoot {
+  background: rgba(15, 23, 42, 0.95);
+  font-weight: 600;
+}
+
+.note {
+  margin-top: 1.5rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+a {
+  color: var(--accent);
+}

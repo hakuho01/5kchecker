@@ -67,9 +67,12 @@ async function fetchCard(card) {
   const cacheHit = getCache(normalized)
   if (cacheHit) return cacheHit
 
+  // 空白は RFC 1738 に従い + でエンコード（Wisdom Guild API 仕様）
+  const nameEncoded = encodeURIComponent(normalized).replace(/%20/g, "+")
+
   const params = {
     api_key: API_KEY,
-    name: encodeURIComponent(normalized),
+    name: nameEncoded,
     timestamp: Math.floor(Date.now() / 1000)
   }
 
@@ -82,28 +85,34 @@ async function fetchCard(card) {
       .map(([k, v]) => `${k}=${v}`)
       .join("&")
 
-  const res = await axios.get(url)
+  try {
+    const res = await axios.get(url, { timeout: 15000, validateStatus: () => true })
 
-  const parsed = await parseStringPromise(res.data)
+    if (res.status !== 200) {
+      console.warn(`[price] ${normalized}: API returned ${res.status}`)
+      return { error: true }
+    }
 
-const item =
-  parsed?.response?.contents?.[0]?.["api-results"]?.[0]?.items?.[0]?.item?.[0]
+    const parsed = await parseStringPromise(res.data)
+    const item =
+      parsed?.response?.contents?.[0]?.["api-results"]?.[0]?.items?.[0]?.item?.[0]
 
-if (!item) {
-  return 0
-}
+    if (!item) {
+      return 0
+    }
 
-const values = item.Price?.[0]?.statistics?.[0]?.value || []
+    const values = item.Price?.[0]?.statistics?.[0]?.value || []
+    const trim = values.find(v => v.$?.type === "trimmean")
 
-const trim = values.find(v => v.$?.type === "trimmean")
+    if (!trim) return 0
 
-if (!trim) return 0
-
-const price = parseFloat(trim._)
-
-  setCache(card, price)
-
-  return price
+    const price = parseFloat(trim._)
+    setCache(normalized, price)
+    return price
+  } catch (err) {
+    console.warn(`[price] ${normalized}:`, err.message || err)
+    return { error: true }
+  }
 }
 
 export async function getPrices(cards) {
