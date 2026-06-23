@@ -104,6 +104,12 @@ function getItemNameCandidates(item) {
   return names
 }
 
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+
+// 202 が返ってきた場合のリトライ設定（処理中なので待って再試行する）
+const MAX_RETRIES = 5
+const RETRY_DELAY_MS = 2000
+
 async function fetchCard(card) {
   const normalized = normalizeCardName(card)
 
@@ -117,23 +123,41 @@ async function fetchCard(card) {
   // 空白は RFC 1738 に従い + でエンコード（Wisdom Guild API 仕様）
   const nameEncoded = encodeURIComponent(normalized).replace(/%20/g, "+")
 
-  const params = {
-    api_key: API_KEY,
-    name: nameEncoded,
-    timestamp: Math.floor(Date.now() / 1000)
-  }
-
-  params.api_sig = makeSignature(params)
-
-  const url =
-    API_URL +
-    "?" +
-    Object.entries(params)
-      .map(([k, v]) => `${k}=${v}`)
-      .join("&")
-
   try {
-    const res = await axios.get(url, { timeout: 15000, validateStatus: () => true })
+    let res
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      // timestamp / 署名はリクエストごとに再生成する
+      const params = {
+        api_key: API_KEY,
+        name: nameEncoded,
+        timestamp: Math.floor(Date.now() / 1000)
+      }
+      params.api_sig = makeSignature(params)
+
+      const url =
+        API_URL +
+        "?" +
+        Object.entries(params)
+          .map(([k, v]) => `${k}=${v}`)
+          .join("&")
+
+      res = await axios.get(url, { timeout: 15000, validateStatus: () => true })
+
+      // 202 = 受付済みだが集計処理中。少し待って再試行する。
+      if (res.status === 202) {
+        if (attempt < MAX_RETRIES) {
+          console.info(
+            `[price] ${normalized}: API returned 202 (processing), retrying (${attempt + 1}/${MAX_RETRIES})`
+          )
+          await sleep(RETRY_DELAY_MS)
+          continue
+        }
+        console.warn(`[price] ${normalized}: still 202 after ${MAX_RETRIES} retries`)
+        return { error: true }
+      }
+
+      break
+    }
 
     if (res.status !== 200) {
       console.warn(`[price] ${normalized}: API returned ${res.status}`)
